@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SCLAlertView
 
 class ViewController: UIViewController {
 
@@ -18,10 +19,8 @@ class ViewController: UIViewController {
     private var themeCardTitles: [String]?
     private var emoji = [Card: String]()
     
-    private let Emojies = Theme.init(backgroundColor: .black, cardColor: .orange, cardTitles: ["🏖", "⛴", "🗺", "⛺️", "🚁", "🚧", "⛩", "🛤", "☎️", "🌋", "🛶", "🛸"])
+    private let Emojies = Theme.init(backgroundColor: .black, cardColor: .orange, cardTitles: ["🏖", "⛴", "🧞‍♂️", "🍺", "🚁", "🚧", "⛩", "🦠", "🍆", "🌋", "🛶", "🛸", "🎾", "🍎", "👽", "🐿"])
     
-    
-    @IBOutlet private weak var matchLabel: UILabel!
     @IBOutlet private weak var scoreLabel: UILabel!
     @IBOutlet private weak var timeBonusLabel: UILabel!
     @IBOutlet private(set) var cardButtons: [UIButton]!
@@ -33,7 +32,21 @@ class ViewController: UIViewController {
         settingTheme()
         updateView()
         restartButton.isHidden = true
+       // SCLAlertView().showInfo("Congratulation", subTitle: "You win!!!")
     }
+    
+    func showAlert(withMessage message: String) {
+            let alertController = UIAlertController(title: "Congratulation", message: message, preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Restart", style: .default, handler: { [self] _ in
+                game.resetCards()
+                game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
+                emoji.removeAll()
+                settingTheme()
+                updateView()
+            })
+            alertController.addAction(alertAction)
+            present(alertController, animated: true, completion: nil)
+        }
     
     private func settingTheme() {
         let themes = [Emojies]
@@ -43,7 +56,6 @@ class ViewController: UIViewController {
         themeCardTitles = themes[randomTheme].cardTitles
         view.backgroundColor = themeBackgroundColor
         restartButton.tintColor = themeCardColor
-        timeBonusLabel.textColor = themeCardColor
     }
     
     private func updateView() {
@@ -71,7 +83,8 @@ class ViewController: UIViewController {
             print("Chosen card was not in cardButtons")
         }
         if game.matches == numberOfPairsOfCards {
-            restartButton.isHidden = false
+            restartButton.isHidden = true
+            showAlert(withMessage: "You win!!!")//.text!)
         }
     }
     
@@ -82,7 +95,6 @@ class ViewController: UIViewController {
         emoji.removeAll()
         settingTheme()
         updateView()
-        
     }
     
     private func emoji(for card: Card) -> String {
@@ -91,11 +103,9 @@ class ViewController: UIViewController {
         }
         return emoji[card] ?? "?"
     }
-    
 }
 
 extension Int {
-    
     var arc4random: Int {
         if self > 0 {
             return Int(arc4random_uniform(UInt32(self)))
@@ -105,5 +115,4 @@ extension Int {
             return 0
         }
     }
-    
 }
